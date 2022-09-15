@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+    syncplay-server:
+        image: ninetaillabs/syncplay-server
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+        ports:
+            - "${PORT}:${PORT}"
+        environment:
+            - PASSWORD=${PASSWORD}
+            - SALT=${SALT}
+            - TLS=/certs
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.services.syncplay.loadbalancer.server.port=${PORT}"
+            - "traefik.docker.network=${PROXY_NETWORK}"
+            - "traefik.http.routers.syncplay.rule=Host(`${VIRTUAL_HOST}`)"
+        networks:
+            - syncplay
+        hostname:
+            ${VIRTUAL_HOST}
+        volumes:
+            - ${CERTPATH}:/certs
+
+
+    certdumper:
+        image: humenius/traefik-certs-dumper:1.6
+        container_name: traefik_certdumper_syncplay
+        network_mode: none
+        command: --restart-containers syncplay-syncplay-server-1
+        volumes:
+          - /storage/webservices/traefik/letsencrypt:/traefik:ro
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+          - ${CERTPATH}:/output:rw
+          - ./hook.sh:/hook/hook.sh:ro
+        environment:
+          - DOMAIN=${VIRTUAL_HOST}
+          - CERTIFICATE_FILE_NAME=combined
+          - PRIVATE_KEY_FILE_NAME=privkey
+          - OVERRIDE_UID=800
+          - OVERRIDE_GID=800
+
+networks:
+    syncplay:
+        name: ${PROXY_NETWORK}
