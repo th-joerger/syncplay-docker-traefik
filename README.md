@@ -8,4 +8,4 @@ This work is based on the [syncplay-server](https://github.com/NinetailLabs/sync
 
 ## Usage
 
-Copy ``.env.dist`` to ``.env`` and set desired password, (sub-)domain name and server salt. Start container with ``docker-compose up -d``. Port 8999 is baked into the docker image and not modifieable. Let's encrypt cert chain is automatically split and stiched into the required files (``cert.pem``, ``chain.pem`` and ``privkey.pem``) with proper UID and GID.
+Copy ``.env.dist`` to ``.env`` and set desired password, (sub-)domain name, server salt and path to traefik's Let's encrypt path containing the ``acme.json``. Start container with ``docker-compose up -d``. Port 8999 is baked into the docker image and not modifieable. Let's encrypt cert chain is automatically split and stiched into the required files (``cert.pem``, ``chain.pem`` and ``privkey.pem``) with proper UID and GID.
